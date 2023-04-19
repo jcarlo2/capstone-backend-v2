@@ -1,14 +1,11 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Getter
@@ -26,14 +23,10 @@ public class TransactionReport {
     @Column(name = "date_time",insertable = false,updatable = false)
     private String timestamp;
     @Column(name = "is_valid",insertable = false,updatable = false)
-    private String isValid;
+    private Boolean isValid;
     @Column(name = "is_archived",insertable = false,updatable = false)
-    private String isArchived;
+    private Boolean isArchived;
     @Column(name = "total_amount")
-    private String totalAmount;
-    @Column(name = "old_id",insertable = false,updatable = false)
-    private String oldId;
+    private BigDecimal totalAmount;
     private BigDecimal credit;
-    @Column(insertable = false)
-    private int bir;
 }

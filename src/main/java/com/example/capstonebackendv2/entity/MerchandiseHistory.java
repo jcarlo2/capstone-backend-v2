@@ -1,11 +1,11 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Getter @Setter
@@ -21,11 +21,11 @@ public class MerchandiseHistory {
     private String name;
     private BigDecimal price;
     @Column(name = "mark")
-    private Double markPrice;
+    private BigDecimal markPrice;
     @Column(name = "mark_percent")
     private Double markPercent;
     @Column(name = "is_mark_up")
-    private String isMarkUp;
+    private Boolean isMarkUp;
     @Column(name = "created_at", updatable = false, insertable = false)
     private String createdAt;
 }

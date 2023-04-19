@@ -1,4 +1,4 @@
-package com.example.capstonebackendv2.enums;
+package com.example.capstonebackendv2.helper.enums;
 
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,8 @@ public enum Category {
     PRODUCE,
     SAUCES_AND_OIL,
     SNACKS,
-    OTHER;
+    OTHER,
+    NONE;
 
     public static Category fromString(@NotNull String str) {
         try {

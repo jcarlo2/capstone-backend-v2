@@ -2,6 +2,7 @@ package com.example.capstonebackendv2.controller;
 
 import com.example.capstonebackendv2.dto.TransactionDTO;
 import com.example.capstonebackendv2.dto.TransactionItemDTO;
+import com.example.capstonebackendv2.dto.TransactionRefundDTO;
 import com.example.capstonebackendv2.dto.TransactionReportDTO;
 import com.example.capstonebackendv2.entity.TransactionReport;
 import com.example.capstonebackendv2.facade.TransactionFacade;
@@ -22,6 +23,11 @@ public class TransactionController {
     @GetMapping("/generate")
     public String generate(@RequestParam String id) {
         return facade.generate(id);
+    }
+
+    @GetMapping("/forward-id")
+    public String forwardId(@RequestParam String id) {
+        return facade.forwardId(id);
     }
 
     @GetMapping("/find-items")
@@ -49,5 +55,10 @@ public class TransactionController {
     @PostMapping("/save")
     public List<String> save(@RequestBody TransactionDTO dto) {
         return facade.save(dto);
+    }
+
+    @PostMapping("/return-refund")
+    public void returnRefund(@RequestBody TransactionRefundDTO dto) {
+        facade.returnRefund(dto);
     }
 }

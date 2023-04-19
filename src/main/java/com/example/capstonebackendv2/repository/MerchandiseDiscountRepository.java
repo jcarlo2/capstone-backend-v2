@@ -1,27 +1,27 @@
-package com.capstone.backend.repository;
+package com.example.capstonebackendv2.repository;
 
-import com.capstone.backend.entity.MerchandiseDiscount;
+import com.example.capstonebackendv2.entity.MerchandiseDiscount;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
 public interface MerchandiseDiscountRepository extends CrudRepository<MerchandiseDiscount, String> {
 
     @Query(value = "SELECT * FROM product_discount WHERE id = ?1 AND quantity <= ?2 ORDER BY discount DESC LIMIT 1 ", nativeQuery = true)
-    MerchandiseDiscount discount(String id, BigDecimal quantity);
+    MerchandiseDiscount getDiscount(String id, Integer quantity);
 
-    List<MerchandiseDiscount> findAllByIdAndIsValidOrderByDiscount(String id, String isValid);
+    List<MerchandiseDiscount> findAllByIdAndIsValidOrderByDiscount(String id, Boolean isValid);
     MerchandiseDiscount findByIdAndQuantity(String id, Integer quantity);
     boolean existsByIdAndQuantity(String id, Integer quantity);
     Integer countAllByIdAndQuantityAndDiscount(String id, Integer quantity, Double discount);
 
-    @Transactional @Modifying
+    @Transactional
+    @Modifying
     void deleteAllByIdAndQuantityAndDiscount(String id, Integer quantity, Double discount);
 
     @Transactional @Modifying

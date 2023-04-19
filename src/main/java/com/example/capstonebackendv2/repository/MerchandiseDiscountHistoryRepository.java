@@ -1,7 +1,6 @@
-package com.capstone.backend.repository;
+package com.example.capstonebackendv2.repository;
 
-import com.capstone.backend.entity.MerchandiseDiscount;
-import com.capstone.backend.entity.MerchandiseDiscountHistory;
+import com.example.capstonebackendv2.entity.MerchandiseDiscountHistory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

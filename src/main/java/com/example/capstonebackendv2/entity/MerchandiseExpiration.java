@@ -1,4 +1,4 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
 
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @AllArgsConstructor @NoArgsConstructor
 @Getter @ToString
@@ -19,7 +19,7 @@ public class MerchandiseExpiration {
     private String name;
     private String timestamp;
     @Column(name = "is_active", insertable = false)
-    private String isActive;
+    private Boolean isActive;
     private Integer quantity;
     @Column(name = "report_id")
     private String reportId;

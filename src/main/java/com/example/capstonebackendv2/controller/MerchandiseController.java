@@ -1,11 +1,10 @@
 package com.example.capstonebackendv2.controller;
 
-import com.example.capstonebackendv2.dto.MerchandiseCategoryDTO;
-import com.example.capstonebackendv2.dto.MerchandiseDTO;
-import com.example.capstonebackendv2.dto.MerchandiseDiscountDTO;
-import com.example.capstonebackendv2.dto.MerchandiseHistoryDTO;
+import com.example.capstonebackendv2.dto.*;
 import com.example.capstonebackendv2.facade.MerchandiseFacade;
 import com.example.capstonebackendv2.helper.enums.Category;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +37,11 @@ public class MerchandiseController {
         return facade.findById(id);
     }
 
+    @GetMapping("/product-exist")
+    public boolean isMerchandiseExist(@RequestParam String id) {
+        return facade.isMerchandiseExist(id);
+    }
+
     @GetMapping("/check-stock")
     public boolean hasStock(@RequestParam String id,@RequestParam Integer quantity) {
         return facade.hasStock(id,quantity);
@@ -68,9 +72,12 @@ public class MerchandiseController {
         return facade.findMerchandiseHistory(id);
     }
 
+    @MessageMapping("/save-discount")
+    @SendTo("/topic/merchandise/save-discount-listener")
     @PostMapping("save-discount")
-    public void saveDiscount(@RequestBody MerchandiseDiscountDTO discount) {
+    public String saveDiscount(@RequestBody MerchandiseDiscountDTO discount) {
         facade.saveDiscount(discount);
+        return discount.getId();
     }
 
     @PostMapping("/save-all-category")
@@ -78,8 +85,16 @@ public class MerchandiseController {
         facade.saveAllCategory(categoryList);
     }
 
+    @PostMapping("add-product")
+    public void addProduct(@RequestBody MerchandiseAddDTO dto) {
+        facade.addProduct(dto);
+    }
+
+    @MessageMapping("/update-info-sender")
+    @SendTo("/topic/merchandise/update-info-listener")
     @PostMapping("/update-info")
-    public void updateInfo(@RequestBody MerchandiseDTO dto) {
+    public String updateInfo(@RequestBody MerchandiseDTO dto) {
         facade.updateInfo(dto);
+        return dto.getId();
     }
 }

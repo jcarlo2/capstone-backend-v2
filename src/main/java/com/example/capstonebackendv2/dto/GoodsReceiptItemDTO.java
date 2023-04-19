@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Getter @Setter @ToString
 @AllArgsConstructor
-public class GoodsReceiptDTO {
+public class GoodsReceiptItemDTO {
     private String id;
     private String description;
     private BigDecimal price;
@@ -17,9 +17,6 @@ public class GoodsReceiptDTO {
     private BigDecimal markPrice;
     private Double markPercent;
     private Boolean isMarkUp;
-    private String link;
-    private String reason;
-    private String timestamp;
-    private String user;
     private String reportId;
+    private String expiration;
 }

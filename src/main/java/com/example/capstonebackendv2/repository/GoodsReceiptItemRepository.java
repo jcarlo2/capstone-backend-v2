@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public interface DeliveryReportItemRepository extends CrudRepository<GoodsReceiptItem,String> {
-    List<GoodsReceiptItem> findAllByUniqueIdOrderByNum(String id);
+public interface GoodsReceiptItemRepository extends CrudRepository<GoodsReceiptItem,String> {
+    List<GoodsReceiptItem> findAllByUniqueId(String id);
 
     @Transactional @Modifying
     @Query(value = "DELETE FROM product_item WHERE unique_id = ?1 ",nativeQuery = true)

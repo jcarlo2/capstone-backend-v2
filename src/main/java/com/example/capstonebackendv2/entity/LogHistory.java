@@ -1,11 +1,11 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Getter
 @Setter

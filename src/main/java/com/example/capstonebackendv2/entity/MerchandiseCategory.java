@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 @Entity(name = "product_category")
 @Getter
 @AllArgsConstructor @NoArgsConstructor
-public class ProductCategory {
+public class MerchandiseCategory {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String no;
     private String id;

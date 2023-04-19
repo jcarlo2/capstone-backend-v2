@@ -1,8 +1,8 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Getter

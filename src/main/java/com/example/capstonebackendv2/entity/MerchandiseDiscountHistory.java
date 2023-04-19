@@ -1,11 +1,11 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Setter
 @Getter
@@ -20,6 +20,6 @@ public class MerchandiseDiscountHistory {
     private String id;
     private Double discount;
     private Integer quantity;
-    @Column(name = "archived_at")
+    @Column(name = "archived_at",insertable = false)
     private String timestamp;
 }

@@ -1,6 +1,6 @@
-package com.capstone.backend.repository;
+package com.example.capstonebackendv2.repository;
 
-import com.capstone.backend.entity.TransactionReportItem;
+import com.example.capstonebackendv2.entity.TransactionReportItem;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

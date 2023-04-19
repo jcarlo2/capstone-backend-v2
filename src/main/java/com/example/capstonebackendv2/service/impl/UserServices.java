@@ -1,4 +1,4 @@
-package com.example.capstonebackendv2.service;
+package com.example.capstonebackendv2.service.impl;
 
 import com.example.capstonebackendv2.entity.User;
 import com.example.capstonebackendv2.repository.UserRepository;

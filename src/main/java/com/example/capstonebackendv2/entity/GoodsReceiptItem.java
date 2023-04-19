@@ -1,11 +1,11 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Getter
@@ -15,7 +15,8 @@ import java.math.BigDecimal;
 @Table(name = "product_item", schema = "retail_management")
 @Entity(name = "product_item")
 public class GoodsReceiptItem {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "no")
     private String num;
     @Column(name = "prod_id")
@@ -25,11 +26,11 @@ public class GoodsReceiptItem {
     private Integer quantity;
     private BigDecimal price;
     @Column(name = "mark_price")
-    private Double markPrice;
+    private BigDecimal markPrice;
     @Column(name = "mark_percent")
     private Double markPercent;
     @Column(name = "is_mark_up")
-    private String isMarkUp;
+    private Boolean isMarkUp;
     @Column(name = "unique_id")
     private String uniqueId;
 }

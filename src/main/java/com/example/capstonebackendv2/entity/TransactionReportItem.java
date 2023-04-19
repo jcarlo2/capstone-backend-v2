@@ -1,8 +1,8 @@
-package com.capstone.backend.entity;
+package com.example.capstonebackendv2.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Getter @Setter
@@ -21,7 +21,7 @@ public class TransactionReportItem {
     private BigDecimal price;
     private Integer sold;
     @Column(name = "sold_total")
-    private String soldTotal;
+    private BigDecimal soldTotal;
     @Column(name = "discount_percentage")
     private Double discountPercentage;
     @Column(name = "total_amount")

@@ -1,15 +1,16 @@
-package com.capstone.backend.facade;
+package com.example.capstonebackendv2.facade;
 
-import com.capstone.backend.service.DateService;
+import com.example.capstonebackendv2.service.impl.DateServiceImpl;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DateFacade {
-    private final DateService service;
+    private final DateServiceImpl service;
 
-    public DateFacade(DateService service) {
+    public DateFacade(DateServiceImpl service) {
         this.service = service;
     }
+
     public String getDate() {
         return service.getDate();
     }
