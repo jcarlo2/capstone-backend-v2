@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public interface DateService {
     String getDate();
@@ -29,4 +30,6 @@ public interface DateService {
         LocalDate date = LocalDate.ofInstant(cal.toInstant(), ZoneId.systemDefault());
         return date.toString();
     }
+
+    List<Integer> getDateAhead();
 }

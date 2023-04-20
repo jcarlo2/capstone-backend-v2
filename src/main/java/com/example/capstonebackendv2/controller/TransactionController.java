@@ -8,6 +8,7 @@ import com.example.capstonebackendv2.entity.TransactionReport;
 import com.example.capstonebackendv2.facade.TransactionFacade;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @CrossOrigin
@@ -60,5 +61,15 @@ public class TransactionController {
     @PostMapping("/return-refund")
     public void returnRefund(@RequestBody TransactionRefundDTO dto) {
         facade.returnRefund(dto);
+    }
+
+    @GetMapping("count-report")
+    public int countActiveReportInBetween(String start, String option) {
+        return facade.countActiveReportInBetween(start,option);
+    }
+
+    @GetMapping("get-annual-break")
+    public List<BigDecimal> getAnnualBreakDown(@RequestParam String start) {
+        return facade.getAnnualBreakDown(start);
     }
 }

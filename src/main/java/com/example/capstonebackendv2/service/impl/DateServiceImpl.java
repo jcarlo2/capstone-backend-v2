@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class DateServiceImpl implements DateService {
@@ -23,9 +25,9 @@ public class DateServiceImpl implements DateService {
         try {
             LocalDateTime date = LocalDateTime.parse(start);
             end = switch (option) {
-                case "Week" -> date.plusWeeks(1).minusDays(1).toString();
-                case "Month" -> date.plusMonths(1).minusDays(1).toString();
-                case "Year" -> date.plusYears(1).minusDays(1).toString();
+                case "Weekly" -> date.plusWeeks(1).minusDays(1).toString();
+                case "Monthly" -> date.plusMonths(1).minusDays(1).toString();
+                case "Annual" -> date.plusYears(1).minusDays(1).toString();
                 default -> date.toString();
             };
         }catch (Exception e) {
@@ -48,12 +50,12 @@ public class DateServiceImpl implements DateService {
         }
         return start;
     }
-    public String getDateAsOf(@NotNull String option, String start) {
+    public String getDateAsOf(@NotNull String start, String option) {
         start = fixStartDate(start,option).split("T")[0];
         LocalDate date = LocalDate.parse(start);
         switch (option) {
             case "Weekly" -> {
-                String end = addDays(start + "T00:00:00","Week").split("T")[0];
+                String end = addDays(start + "T00:00:00","Weekly").split("T")[0];
                 int endAndNow = LocalDate.parse(end).compareTo(LocalDate.now());
                 if(endAndNow > 0) return start + " to " + LocalDate.now();
                 return start + " to " + end;
@@ -66,5 +68,16 @@ public class DateServiceImpl implements DateService {
             }
         }
         return start;
+    }
+
+    @Override
+    public List<Integer> getDateAhead() {
+        List<Integer> yearList = new ArrayList<>();
+        LocalDate date = LocalDate.now();
+        while(date.getYear() > 2015) {
+            date = date.minusYears(1);
+            yearList.add(date.getYear());
+        }
+        return yearList;
     }
 }

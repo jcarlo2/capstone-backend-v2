@@ -16,4 +16,6 @@ public interface InventoryLossItemRepository extends CrudRepository<InventoryLos
     @Transactional @Modifying
     @Query(value = "DELETE FROM null_item WHERE report_id = ?1 ",nativeQuery = true)
     void delete(String id);
+
+    List<InventoryLossItem> findAllByReportIdOrderByNum(String id);
 }

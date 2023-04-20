@@ -17,4 +17,6 @@ public interface GoodsReceiptReportRepository extends CrudRepository<GoodsReceip
     @Transactional @Modifying
     @Query(value = "UPDATE product_report SET is_valid = 0, is_archived = 1 WHERE id = ?1", nativeQuery = true)
     void setInactive(String id);
+
+    List<GoodsReceiptReport> findAllByIsValidAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(Boolean isValid, String start, String end);
 }

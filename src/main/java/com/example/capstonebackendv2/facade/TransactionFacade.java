@@ -6,15 +6,13 @@ import com.example.capstonebackendv2.dto.TransactionRefundDTO;
 import com.example.capstonebackendv2.dto.TransactionReportDTO;
 import com.example.capstonebackendv2.entity.*;
 import com.example.capstonebackendv2.helper.Mapper;
-import com.example.capstonebackendv2.service.impl.GoodsReceiptServiceImpl;
-import com.example.capstonebackendv2.service.impl.InventoryLossServiceImpl;
-import com.example.capstonebackendv2.service.impl.MerchandiseServiceImpl;
-import com.example.capstonebackendv2.service.impl.TransactionServiceImpl;
+import com.example.capstonebackendv2.service.impl.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +22,17 @@ public class TransactionFacade {
     private final MerchandiseServiceImpl merchandiseService;
     private final InventoryLossServiceImpl lossService;
     private final GoodsReceiptServiceImpl goodsService;
+    private final DateServiceImpl dateService;
+    private final GenerateReportServiceImpl generateReportService;
     private final Mapper mapper;
 
-    public TransactionFacade(TransactionServiceImpl service, MerchandiseServiceImpl merchandiseService, InventoryLossServiceImpl lossService, GoodsReceiptServiceImpl goodsService, Mapper mapper) {
+    public TransactionFacade(TransactionServiceImpl service, MerchandiseServiceImpl merchandiseService, InventoryLossServiceImpl lossService, GoodsReceiptServiceImpl goodsService, DateServiceImpl dateService, GenerateReportServiceImpl generateReportService, Mapper mapper) {
         this.service = service;
         this.merchandiseService = merchandiseService;
         this.lossService = lossService;
         this.goodsService = goodsService;
+        this.dateService = dateService;
+        this.generateReportService = generateReportService;
         this.mapper = mapper;
     }
 
@@ -106,5 +108,24 @@ public class TransactionFacade {
             merchandiseService.updateQuantity(item.getId(),-1 * (item.getQuantity() + item.getExpired() + item.getDamaged()));
             merchandiseService.updateProductExpiryQuantity(item.getId(),item.getQuantity() + item.getExpired() + item.getDamaged());
         });
+    }
+
+    public int countActiveReportInBetween(@NotNull String start, String option) {
+        if(start.equals("")) return 0;
+        start = dateService.fixStartDate(start,option);
+        String end = dateService.addDays(start, option);
+        return service.countActiveReportInBetween(start,end);
+    }
+
+    public List<BigDecimal> getAnnualBreakDown(String start) {
+        List<BigDecimal> breakDown = new ArrayList<>();
+        int MONTHS = 12;
+        for(int i=1;i<=MONTHS;i++) {
+            String a = start + "-"+ (i<10 ? "0" + i : i) + "-01T00:00:00";
+            String b = dateService.addDays(a, "Month");
+            BigDecimal total = service.getAnnualBreakDown(generateReportService.generateSalesProductReport(a,b));
+            breakDown.add(total);
+        }
+        return breakDown;
     }
 }

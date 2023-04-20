@@ -27,4 +27,6 @@ public interface TransactionReportRepository extends CrudRepository<TransactionR
     @Query(value = "UPDATE transaction_report SET is_valid = 1 WHERE id = ?1",nativeQuery = true)
     void validate(String id);
 
+    List<TransactionReport> findAllByIsValidAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(Boolean isValid, String start, String end);
+
 }

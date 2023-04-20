@@ -1,16 +1,19 @@
 package com.example.capstonebackendv2.service.impl;
 
+import com.example.capstonebackendv2.dto.ProductReportDTO;
 import com.example.capstonebackendv2.entity.TransactionReport;
 import com.example.capstonebackendv2.entity.TransactionReportItem;
 import com.example.capstonebackendv2.repository.TransactionItemRepository;
 import com.example.capstonebackendv2.repository.TransactionReportRepository;
 import com.example.capstonebackendv2.service.Generate;
 import com.example.capstonebackendv2.service.TransactionService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -40,6 +43,22 @@ public class TransactionServiceImpl implements TransactionService, Generate {
     public void invalidate(String id) {
         reportRepository.invalidate(id);
         reportRepository.archive(id);
+    }
+
+    @Override
+    public int countActiveReportInBetween(String start, String end) {
+        return reportRepository.
+                findAllByIsValidAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc
+                        (true, start,end).size();
+    }
+
+    @Override
+    public BigDecimal getAnnualBreakDown(@NotNull List<ProductReportDTO> reports) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (ProductReportDTO report : reports) {
+            total = total.add(report.getTotal());
+        }
+        return total;
     }
 
     @Override

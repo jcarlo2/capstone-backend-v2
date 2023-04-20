@@ -24,4 +24,6 @@ public interface InventoryLossReportRepository extends CrudRepository<InventoryL
     @Transactional @Modifying
     @Query(value = "UPDATE null_report SET is_archived = 1 WHERE id = ?1",nativeQuery = true)
     void archive(String id);
+
+    List<InventoryLossReport> findAllByIsValidAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(Boolean IsValid, String start, String end );
 }

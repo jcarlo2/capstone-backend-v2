@@ -3,6 +3,8 @@ package com.example.capstonebackendv2.controller;
 import com.example.capstonebackendv2.facade.DateFacade;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/date")
@@ -26,5 +28,10 @@ public class DateController {
     @GetMapping("/get-date-asOf")
     public String getDateAsOf(@RequestParam String start, @RequestParam String option) {
         return facade.getDateAsOf(start,option);
+    }
+
+    @GetMapping("get-date-ahead")
+    public List<Integer> getDateAhead() {
+        return facade.getDateAhead();
     }
 }

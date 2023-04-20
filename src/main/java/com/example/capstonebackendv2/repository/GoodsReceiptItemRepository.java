@@ -16,4 +16,6 @@ public interface GoodsReceiptItemRepository extends CrudRepository<GoodsReceiptI
     @Transactional @Modifying
     @Query(value = "DELETE FROM product_item WHERE unique_id = ?1 ",nativeQuery = true)
     void delete(String id);
+
+    List<GoodsReceiptItem> findAllByUniqueIdOrderByNum(String id);
 }
