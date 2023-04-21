@@ -12,18 +12,17 @@ import java.util.List;
 @Repository
 public interface UserRepository extends CrudRepository<User,String> {
     boolean existsUserByUsernameAndPasswordAndIsActive(String username, String password, boolean isActive);
-    boolean existsByFirstNameAndLastName(String firstName, String lastName);
+    boolean existsByUsername(String id);
     User findByUsernameAndPasswordAndIsActive(String username, String password,boolean isActive);
-    List<User> findAllByUsernameNotContainsAndFirstNameNotContainingAndLastNameNotContainingAndIsActive(String username, String firstName, String lastName,boolean isActive);
-
+    List<User> findAllByUsernameNotContainsAndFirstNameNotContainingAndLastNameNotContainingAndIsActive
+            (String id, String firstName, String lastName,Boolean isActive);
     @Transactional @Modifying
     @Query(value = "UPDATE user SET is_active = 0 WHERE id = ?1",nativeQuery = true)
     void archiveUserAccount(String id);
 
     @Transactional @Modifying
-    void removeByUsername(String username);
-
-    @Transactional @Modifying
     @Query(value = "UPDATE user SET password = ?3 WHERE id = ?1 AND password = ?2",nativeQuery = true)
     void changePassword(String username, String oldPassword, String newPassword);
+
+    List<User> findAllByIsActiveOrderByUsername(Boolean isActive);
 }

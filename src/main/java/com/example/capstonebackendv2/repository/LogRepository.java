@@ -11,8 +11,8 @@ import java.util.List;
 @Repository
 public interface LogRepository extends CrudRepository<Log,String> {
     List<Log> findAllByOrderByTimestampDesc();
-    List<Log> findAllByIsDeletable(String isDeletable);
+    List<Log> findAllByIsDeletable(Boolean isDeletable);
 
     @Transactional @Modifying
-    void removeAllByIsDeletable(String isDeletable);
+    void removeAllByIsDeletable(Boolean isDeletable);
 }

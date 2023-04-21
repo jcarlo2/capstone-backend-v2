@@ -7,10 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -171,7 +168,7 @@ public class Mapper {
                     item.getId(),
                     item.getDescription(),
                     item.getExpiration() + " 23:59:59",
-                    true,
+                    "1",
                     item.getQuantity(),
                     item.getReportId()
                 )).collect(Collectors.toList());
@@ -389,5 +386,48 @@ public class Mapper {
                 item.getTotal(),
                 newId
         )).collect(Collectors.toList());
+    }
+
+    public List<LogDTO> logsEntityToDTO(@NotNull List<Log> show) {
+        return show.stream().map(item -> new LogDTO(
+                item.getNo(),
+                item.getUser(),
+                item.getAction(),
+                item.getDescription(),
+                item.getTimestamp()
+        )).collect(Collectors.toList());
+    }
+
+    public Log logDTOToEntity(@NotNull LogDTO dto) {
+        return new Log(
+                "",
+                dto.getUser(),
+                dto.getAction(),
+                dto.getDescription(),
+                "",
+                true
+        );
+    }
+
+    public MerchandiseDiscountHistory merchandiseDTOToHistoryEntity(@NotNull MerchandiseDiscountDTO dto) {
+        return new MerchandiseDiscountHistory(
+                "",
+                dto.getId(),
+                dto.getDiscount(),
+                dto.getQuantity(),
+                ""
+        );
+    }
+
+    public User userDTOToEntity(@NotNull UserDTO user) {
+        String password = Base64.getEncoder().encodeToString(user.getUsername().getBytes());
+        return new User(
+                user.getUsername(),
+                password,
+                user.getFirstName(),
+                user.getLastName(),
+                1,
+                "",true,true
+        );
     }
 }

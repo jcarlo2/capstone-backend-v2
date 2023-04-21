@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Repository
 public interface MerchandiseRepository extends CrudRepository<Merchandise, String> {
@@ -26,4 +27,5 @@ public interface MerchandiseRepository extends CrudRepository<Merchandise, Strin
     Page<Merchandise> findAllByPriceLessThanEqualAndIsActive(BigDecimal search, boolean isActive, Pageable pageable);
     Merchandise findByIdAndIsActive(String id, Boolean isActive);
     boolean existsByIdIgnoreCase(String id);
+
 }

@@ -3,8 +3,6 @@ package com.example.capstonebackendv2.controller;
 import com.example.capstonebackendv2.dto.*;
 import com.example.capstonebackendv2.facade.MerchandiseFacade;
 import com.example.capstonebackendv2.helper.enums.Category;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,12 +70,9 @@ public class MerchandiseController {
         return facade.findMerchandiseHistory(id);
     }
 
-    @MessageMapping("/save-discount")
-    @SendTo("/topic/merchandise/save-discount-listener")
     @PostMapping("save-discount")
-    public String saveDiscount(@RequestBody MerchandiseDiscountDTO discount) {
+    public void saveDiscount(@RequestBody MerchandiseDiscountDTO discount) {
         facade.saveDiscount(discount);
-        return discount.getId();
     }
 
     @PostMapping("/save-all-category")
@@ -90,11 +85,29 @@ public class MerchandiseController {
         facade.addProduct(dto);
     }
 
-    @MessageMapping("/update-info-sender")
-    @SendTo("/topic/merchandise/update-info-listener")
     @PostMapping("/update-info")
-    public String updateInfo(@RequestBody MerchandiseDTO dto) {
+    public void updateInfo(@RequestBody MerchandiseDTO dto) {
         facade.updateInfo(dto);
-        return dto.getId();
+    }
+
+    @PostMapping("remove-discount")
+    public MerchandiseDiscountDTO removeDiscount(@RequestBody MerchandiseDiscountDTO dto) {
+        facade.removeDiscount(dto);
+        return dto;
+    }
+
+    @GetMapping("find-all-history")
+    public MerchandiseHistoriesDTO findMerchandiseHistories(String id) {
+        return facade.findMerchandiseHistories(id);
+    }
+
+    @GetMapping("notification")
+    public List<NotificationDTO> findNotification() {
+        return facade.findNotification();
+    }
+
+    @GetMapping("dispose")
+    public void dispose(@RequestParam String id) {
+        facade.dispose(id);
     }
 }

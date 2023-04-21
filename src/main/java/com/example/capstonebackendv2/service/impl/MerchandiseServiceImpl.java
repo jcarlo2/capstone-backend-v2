@@ -1,11 +1,15 @@
 package com.example.capstonebackendv2.service.impl;
 
 import com.example.capstonebackendv2.dto.MerchandiseDTO;
+import com.example.capstonebackendv2.dto.MerchandiseDiscountDTO;
+import com.example.capstonebackendv2.dto.MerchandiseHistoriesDTO;
+import com.example.capstonebackendv2.dto.NotificationDTO;
 import com.example.capstonebackendv2.entity.*;
 import com.example.capstonebackendv2.helper.enums.Category;
 import com.example.capstonebackendv2.repository.*;
 import com.example.capstonebackendv2.service.MerchandiseService;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -114,13 +123,6 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     @Override
     public void saveDiscount(MerchandiseDiscount discount) {
         discountRepository.save(discount);
-        discountHistoryRepository.save(new MerchandiseDiscountHistory(
-                "",
-                discount.getId(),
-                discount.getDiscount(),
-                discount.getQuantity(),
-                ""
-        ));
     }
 
     @Override
@@ -137,6 +139,73 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     public void addProduct(List<MerchandiseCategory> categoryList, Merchandise merchandise) {
         merchandiseRepository.save(merchandise);
         categoryRepository.saveAll(categoryList);
+    }
+
+    @Override
+    public void removeDiscount(@NotNull MerchandiseDiscountDTO dto, MerchandiseDiscountHistory history) {
+        discountRepository.deleteAllByIdAndQuantityAndDiscount(dto.getId(), dto.getQuantity(), dto.getDiscount());
+        discountHistoryRepository.save(history);
+    }
+
+    @Override
+    public MerchandiseHistoriesDTO findMerchandiseHistories(String id) {
+        List<MerchandiseHistory> merchandiseHistoryList = merchandiseHistoryRepository.findAllByIdOrderByCreatedAtDesc(id);
+        List<MerchandiseDiscountHistory> discountHistoryList = discountHistoryRepository.findAllByIdOrderByTimestampDesc(id);
+        return new MerchandiseHistoriesDTO(merchandiseHistoryList, discountHistoryList);
+    }
+
+    @Override
+    public List<NotificationDTO> findNotification() {
+        List<MerchandiseExpiration> expirationList = expirationRepository.findAllByIsActiveOrderByTimestampDesc("3");
+        List<MerchandiseExpiration> activeList = expirationRepository.findAllByIsActiveOrderByTimestampDesc("1");
+        List<Merchandise> merchandiseList = new ArrayList<>();
+        merchandiseRepository.findAll().forEach(merchandiseList::add);
+        List<NotificationDTO> list = new ArrayList<>();
+        setListForProductNotification( expirationList, activeList, merchandiseList, list);
+        return list;
+    }
+
+    private static void setListForProductNotification(
+            @NotNull List<MerchandiseExpiration> expirationList,
+            @NotNull List<MerchandiseExpiration> activeList,
+            @NotNull List<Merchandise> merchandiseList,
+            @NotNull List<NotificationDTO> list) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        int[] num = {0};
+        list.addAll(expirationList.stream().map(item -> new NotificationDTO(
+                num[0]++,item.getId(), item.getName(), item.getQuantity(), "Need to dispose", "dispose"
+        )).toList());
+        list.addAll(activeList.stream().map(item -> {
+            LocalDateTime time = LocalDateTime.parse(item.getTimestamp(), formatter);
+            Duration duration = Duration.between(now, time);
+            long daysDiff = duration.toDays();
+            String reason = "";
+            String color = "critical";
+
+            if (daysDiff <= 1) reason = "Will expired today";
+            else if (daysDiff <= 2) reason = "Will expired within 2 days";
+            else if (daysDiff <= 3) reason = "Will expired within 3 days";
+            else if (daysDiff <= 7) {
+                reason = "Will expired within a week";
+                color = "low";
+            } else if (daysDiff <= 14) {
+                reason = "Will expired within two weeks";
+                color = "low";
+            }
+            if (reason.equals("")) return null;
+            return new NotificationDTO(num[0]++,item.getId(), item.getName(), item.getQuantity(), reason, color);
+        }).filter(Objects::nonNull).toList());
+        list.addAll(merchandiseList.stream().map(item -> {
+            String reason = "";
+            String color = "low";
+            if (item.getQuantity() == 0 || item.getQuantity() <= item.getPiecesPerBox() / 2) {
+                reason = "Critical Stock";
+                color = "critical";
+            } else if (item.getQuantity() <= item.getPiecesPerBox()) reason = "Low Stock";
+            if (reason.equals("")) return null;
+            return new NotificationDTO(num[0]++,item.getId(), item.getDescription(), item.getQuantity(), reason, color);
+        }).filter(Objects::nonNull).toList());
     }
 
     @Override
@@ -165,7 +234,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
 
     @Override @Transactional
     public void updateProductExpiryQuantity(String id, Integer quantity) {
-        List<MerchandiseExpiration> list = expirationRepository.findAllByIdAndIsActiveOrderByTimestamp(id, true);
+        List<MerchandiseExpiration> list = expirationRepository.findAllByIdAndIsActiveOrderByTimestamp(id, "1");
         if (list.isEmpty()) return;
         for (MerchandiseExpiration expiration : list) {
             int remainingQuantity = quantity - expiration.getQuantity();
@@ -188,7 +257,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
 
     @Override
     public String findExpirationDateById(String id, String reportId) {
-        MerchandiseExpiration merchandise = expirationRepository.findByIdAndReportIdAndIsActiveOrderByTimestampDesc(id,reportId,true);
+        MerchandiseExpiration merchandise = expirationRepository.findByIdAndReportIdAndIsActiveOrderByTimestampDesc(id,reportId,"1");
         return merchandise != null ? merchandise.getTimestamp() : "";
     }
 
@@ -199,7 +268,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
 
     @Override
     public boolean isMerchandiseExpirationActiveAndHasStock(String id, String reportId, Integer quantity) {
-        return expirationRepository.existsByIdAndReportIdAndIsActiveAndQuantityGreaterThan(id,reportId,true,quantity);
+        return expirationRepository.existsByIdAndReportIdAndIsActiveAndQuantityGreaterThan(id,reportId,"1",quantity);
     }
 
     @Override
@@ -209,8 +278,8 @@ public class MerchandiseServiceImpl implements MerchandiseService {
 
     @Override @Transactional
     public void updateProductExpiryQuantityAndSetActive(String id, Integer quantity) {
-        List<MerchandiseExpiration> expirationList = expirationRepository.findAllByIdAndIsActiveOrderByTimestamp(id,true);
-        if(expirationList.size() == 0) expirationList = expirationRepository.findAllByIdAndIsActiveOrderByTimestampDesc(id,false);
+        List<MerchandiseExpiration> expirationList = expirationRepository.findAllByIdAndIsActiveOrderByTimestamp(id,"1");
+        if(expirationList.size() == 0) expirationList = expirationRepository.findAllByIdAndIsActiveOrderByTimestampDesc(id,"0");
         MerchandiseExpiration expiration = expirationList.get(0);
         quantity = expiration.getQuantity() < 0 ? quantity : expiration.getQuantity() + quantity;
         expirationRepository.updateQuantityAndSetToActive(expiration.getId(),quantity);
@@ -219,5 +288,46 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     @Override
     public List<MerchandiseDiscount> findAllDiscount(String id) {
         return discountRepository.findAllByIdAndIsValidOrderByDiscount(id,true);
+    }
+
+    /**
+     * Return a list of MerchandiseExpiration where timestamp is greater than date today
+     * **/
+    @Override
+    public List<MerchandiseExpiration> autoCheckMerchandiseExpiration() {
+        List<MerchandiseExpiration> list = new ArrayList<>();
+        Iterable<Merchandise> merchandiseList = merchandiseRepository.findAll();
+        String dateToday = LocalDate.now() + " 23:59:59";
+        for(Merchandise merch : merchandiseList) {
+            List<MerchandiseExpiration> merchandiseExpirationList = getAllActiveExpirationById(merch.getId());
+            if(merchandiseExpirationList != null) {
+                merchandiseExpirationList.forEach(merchandiseExpiration -> {
+                    if(compareByDate(dateToday,merchandiseExpiration.getTimestamp())) {
+                        list.add(merchandiseExpiration);
+                    }
+                });
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void dispose(String id) {
+        List<MerchandiseExpiration> expirationList = expirationRepository.findAllByIdAndIsActiveOrderByTimestampDesc(id,"3");
+        expirationList.forEach(item -> {
+            expirationRepository.updateToDisposeExpiration(item.getId(),item.getTimestamp(),item.getReportId());
+            merchandiseRepository.updateQuantity(item.getId(),-1 * item.getQuantity());
+        });
+    }
+
+    @Override
+    public void updateToDisposeExpiration(String id, String timestamp, String reportId) {
+        expirationRepository.updateToDisposeExpiration(id,timestamp, reportId);
+    }
+
+    @Override
+    public @Nullable List<MerchandiseExpiration> getAllActiveExpirationById(String id) {
+        List<MerchandiseExpiration> merch = expirationRepository.findAllByIdAndIsActiveOrderByTimestamp(id,"1");
+        return merch.size() > 0 ? merch : null;
     }
 }

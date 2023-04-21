@@ -1,16 +1,17 @@
 package com.example.capstonebackendv2.facade;
 
 import com.example.capstonebackendv2.dto.*;
-import com.example.capstonebackendv2.entity.Merchandise;
-import com.example.capstonebackendv2.entity.MerchandiseCategory;
-import com.example.capstonebackendv2.entity.MerchandiseHistory;
-import com.example.capstonebackendv2.helper.enums.Category;
+import com.example.capstonebackendv2.entity.*;
 import com.example.capstonebackendv2.helper.Mapper;
+import com.example.capstonebackendv2.helper.enums.Category;
 import com.example.capstonebackendv2.service.impl.MerchandiseServiceImpl;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class MerchandiseFacade {
@@ -20,6 +21,24 @@ public class MerchandiseFacade {
     public MerchandiseFacade(MerchandiseServiceImpl service, Mapper mapper) {
         this.service = service;
         this.mapper = mapper;
+        autoCheckerOfMerchandiseExpiration();
+    }
+
+    /**
+     * Auto checking and validating of all merchandise expiration
+     * set isActive to false then create @NullReport
+     **/
+    private void autoCheckerOfMerchandiseExpiration() {
+        Runnable run = () -> {
+            List<MerchandiseExpiration> merchandiseExpirationList = service.autoCheckMerchandiseExpiration();
+            merchandiseExpirationList.forEach(item -> service.updateToDisposeExpiration(
+                    item.getId(),
+                    item.getTimestamp(),
+                    item.getReportId()
+            ));
+        };
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+        service.scheduleAtFixedRate(run,1,60, TimeUnit.SECONDS);
     }
 
     public List<MerchandiseDTO> findAll(int size, String sortBy, Category category, String search, boolean isAscending) {
@@ -79,5 +98,22 @@ public class MerchandiseFacade {
         List<MerchandiseCategory> categoryList = mapper.addProductCategoryListToEntity(dto.getCategoryList(),dto.getMerchandise().getId());
         Merchandise merchandise = mapper.merchandiseDTOToEntity(dto.getMerchandise());
         service.addProduct(categoryList, merchandise);
+    }
+
+    public void removeDiscount(MerchandiseDiscountDTO dto) {
+        MerchandiseDiscountHistory history = mapper.merchandiseDTOToHistoryEntity(dto);
+        service.removeDiscount(dto,history);
+    }
+
+    public MerchandiseHistoriesDTO findMerchandiseHistories(String id) {
+        return service.findMerchandiseHistories(id);
+    }
+
+    public List<NotificationDTO> findNotification() {
+        return service.findNotification();
+    }
+
+    public void dispose(String id) {
+        service.dispose(id);
     }
 }

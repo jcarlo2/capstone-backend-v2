@@ -19,7 +19,7 @@ public class MerchandiseExpiration {
     private String name;
     private String timestamp;
     @Column(name = "is_active", insertable = false)
-    private Boolean isActive;
+    private String isActive;
     private Integer quantity;
     @Column(name = "report_id")
     private String reportId;

@@ -1,11 +1,16 @@
 package com.example.capstonebackendv2.service;
 
 import com.example.capstonebackendv2.dto.MerchandiseDTO;
+import com.example.capstonebackendv2.dto.MerchandiseDiscountDTO;
+import com.example.capstonebackendv2.dto.MerchandiseHistoriesDTO;
+import com.example.capstonebackendv2.dto.NotificationDTO;
 import com.example.capstonebackendv2.entity.*;
 import com.example.capstonebackendv2.helper.enums.Category;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public interface MerchandiseService {
@@ -33,4 +38,23 @@ public interface MerchandiseService {
     List<MerchandiseHistory> findMerchandiseHistory(String id);
     boolean isMerchandiseExist(String id);
     void addProduct(List<MerchandiseCategory> categoryList, Merchandise merchandise);
+    void removeDiscount(MerchandiseDiscountDTO dto, MerchandiseDiscountHistory history);
+    MerchandiseHistoriesDTO findMerchandiseHistories(String id);
+    List<NotificationDTO> findNotification();
+    List<MerchandiseExpiration> getAllActiveExpirationById(String id);
+    void updateToDisposeExpiration(String id, String timestamp, String reportId);
+    List<MerchandiseExpiration> autoCheckMerchandiseExpiration();
+    default boolean compareByDate(String a, String b) {
+        try {
+            SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
+            Date dateA = dtf.parse(a);
+            Date dateB = dtf.parse(b);
+            if(dateA.compareTo(dateB) > 0) return true;
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    void dispose(String id);
 }

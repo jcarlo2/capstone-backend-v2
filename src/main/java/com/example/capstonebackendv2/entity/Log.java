@@ -20,5 +20,5 @@ public class Log {
     @Column(name = "date_time", insertable = false)
     private String timestamp;
     @Column(name = "is_deletable")
-    private String isDeletable;
+    private Boolean isDeletable;
 }
