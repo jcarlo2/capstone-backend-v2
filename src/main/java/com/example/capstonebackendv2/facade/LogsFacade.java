@@ -24,4 +24,8 @@ public class LogsFacade {
     public void submit(LogDTO dto) {
         service.submit(mapper.logDTOToEntity(dto));
     }
+
+    public void archive() {
+        service.archive();
+    }
 }

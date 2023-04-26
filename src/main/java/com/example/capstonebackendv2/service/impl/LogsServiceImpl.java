@@ -17,11 +17,17 @@ public class LogsServiceImpl implements LogsService {
 
     @Override
     public List<Log> show() {
-        return logRepository.findAllByIsDeletable(true);
+        return logRepository.findAllByIsDeletableOrderByTimestampDesc(true);
     }
 
     @Override
     public void submit(Log log) {
         logRepository.save(log);
+    }
+
+    @Override
+    public void archive() {
+        logRepository.adminArchive();
+        logRepository.save(new Log("","100000","Logs Archive","...","",true,false));
     }
 }

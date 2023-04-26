@@ -7,4 +7,5 @@ import java.util.List;
 public interface LogsService {
     List<Log> show();
     void submit(Log logDTOToEntity);
+    void archive();
 }

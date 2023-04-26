@@ -16,4 +16,8 @@ public interface TransactionService {
     void invalidate(String id);
     int countActiveReportInBetween(String start, String end);
     BigDecimal getAnnualBreakDown(List<ProductReportDTO> reports);
+
+    List<TransactionReport> findAllValidReportByEnd(String date);
+
+    void archive(String id);
 }

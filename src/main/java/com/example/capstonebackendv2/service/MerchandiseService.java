@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 public interface MerchandiseService {
     List<Merchandise> findAll(int size, String sortBy, Category filterBy, String search, boolean isAscending);
@@ -44,6 +45,8 @@ public interface MerchandiseService {
     List<MerchandiseExpiration> getAllActiveExpirationById(String id);
     void updateToDisposeExpiration(String id, String timestamp, String reportId);
     List<MerchandiseExpiration> autoCheckMerchandiseExpiration();
+    void dispose(String id);
+    String generateId(String id);
     default boolean compareByDate(String a, String b) {
         try {
             SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd 23:59:59");
@@ -56,5 +59,12 @@ public interface MerchandiseService {
         return false;
     }
 
-    void dispose(String id);
+    default String generate() {
+        Random random = new Random();
+        String letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        return letters.charAt(random.nextInt(26)) + ""
+                + letters.charAt(random.nextInt(26)) + ""
+                + letters.charAt(random.nextInt(26))
+                + String.format("%06d", random.nextInt(1000000));
+    }
 }

@@ -16,7 +16,7 @@ public interface MerchandiseExpirationRepository extends CrudRepository<Merchand
     void toInactiveWithTimestamp(String id, String timestamp, String reportId);
 
     @Transactional @Modifying
-    @Query(value = "UPDATE product_expiration SET is_active = 3 WHERE id = ?1 AND timestamp = ?2 AND report_id = ?3",nativeQuery = true)
+    @Query(value = "UPDATE product_expiration SET is_active = 0 WHERE id = ?1 AND timestamp = ?2 AND report_id = ?3",nativeQuery = true)
     void updateToDisposeExpiration(String id, String timestamp, String reportId);
 
     @Transactional @Modifying

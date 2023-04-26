@@ -116,4 +116,8 @@ public class MerchandiseFacade {
     public void dispose(String id) {
         service.dispose(id);
     }
+
+    public String generateId(String id) {
+        return service.generateId(id);
+    }
 }

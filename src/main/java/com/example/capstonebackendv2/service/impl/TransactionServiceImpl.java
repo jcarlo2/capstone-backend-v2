@@ -62,6 +62,16 @@ public class TransactionServiceImpl implements TransactionService, Generate {
     }
 
     @Override
+    public List<TransactionReport> findAllValidReportByEnd(String end) {
+        return reportRepository.findAllByIsValidAndTimestampLessThanEqualOrderByTimestampDesc(true,end);
+    }
+
+    @Override
+    public void archive(String id) {
+        reportRepository.archive(id);
+    }
+
+    @Override
     public List<TransactionReport> findAllReportByCriteria(Boolean valid, Boolean archived, String search, String start, String end,int size) {
         Pageable pageable = PageRequest.of(0,size);
         return reportRepository.

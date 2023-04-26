@@ -14,7 +14,7 @@ import java.util.List;
 public interface TransactionReportRepository extends CrudRepository<TransactionReport, String> {
     List<TransactionReport> findAllByIsValidAndIsArchivedAndIdContainingIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc
             (boolean valid, boolean archived, String search, String start, String end, Pageable pageable);
-
+    List<TransactionReport> findAllByIsValidAndTimestampLessThanEqualOrderByTimestampDesc(Boolean isValid,String end);
     @Modifying @Transactional
     @Query(value = "UPDATE transaction_report SET is_valid = 0 WHERE id = ?1",nativeQuery = true)
     void invalidate(String id);

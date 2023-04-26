@@ -5,6 +5,7 @@ import com.example.capstonebackendv2.dto.TransactionItemDTO;
 import com.example.capstonebackendv2.dto.TransactionRefundDTO;
 import com.example.capstonebackendv2.dto.TransactionReportDTO;
 import com.example.capstonebackendv2.entity.*;
+import com.example.capstonebackendv2.gui.GUI;
 import com.example.capstonebackendv2.helper.Mapper;
 import com.example.capstonebackendv2.service.impl.*;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +14,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class TransactionFacade {
@@ -25,8 +30,9 @@ public class TransactionFacade {
     private final DateServiceImpl dateService;
     private final GenerateReportServiceImpl generateReportService;
     private final Mapper mapper;
+    private final GUI gui;
 
-    public TransactionFacade(TransactionServiceImpl service, MerchandiseServiceImpl merchandiseService, InventoryLossServiceImpl lossService, GoodsReceiptServiceImpl goodsService, DateServiceImpl dateService, GenerateReportServiceImpl generateReportService, Mapper mapper) {
+    public TransactionFacade(TransactionServiceImpl service, MerchandiseServiceImpl merchandiseService, InventoryLossServiceImpl lossService, GoodsReceiptServiceImpl goodsService, DateServiceImpl dateService, GenerateReportServiceImpl generateReportService, Mapper mapper, GUI gui) {
         this.service = service;
         this.merchandiseService = merchandiseService;
         this.lossService = lossService;
@@ -34,6 +40,25 @@ public class TransactionFacade {
         this.dateService = dateService;
         this.generateReportService = generateReportService;
         this.mapper = mapper;
+        this.gui = gui;
+        autoArchivedRecordFromPastYear();
+    }
+    private void autoArchivedRecordFromPastYear() {
+        Runnable run = () -> {
+            LocalDate pastDate = LocalDate.now();
+            int num = gui.getArchiveNumber();
+            switch (num) {
+                case 1 -> pastDate = pastDate.minusMonths(1);
+                case 3 -> pastDate = pastDate.minusMonths(3);
+                case 6 -> pastDate = pastDate.minusMonths(6);
+                default -> pastDate = pastDate.minusYears(1);
+            }
+            String date = pastDate + "T23:59:59";
+            List<TransactionReport> reportList = service.findAllValidReportByEnd(date);
+            reportList.forEach(report -> service.archive(report.getId()));
+        };
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(run,1,60, TimeUnit.SECONDS);
     }
 
     public String generate(String id) {

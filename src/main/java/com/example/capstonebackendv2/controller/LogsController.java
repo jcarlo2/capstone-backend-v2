@@ -21,6 +21,11 @@ public class LogsController {
         return facade.show();
     }
 
+    @GetMapping("/archive")
+    public void archive() {
+        facade.archive();
+    }
+
     @PostMapping("/submit")
     public void submit(@RequestBody LogDTO dto) {
         facade.submit(dto);

@@ -110,4 +110,9 @@ public class MerchandiseController {
     public void dispose(@RequestParam String id) {
         facade.dispose(id);
     }
+
+    @GetMapping("/generate")
+    public String generateId(@RequestParam String id) {
+        return facade.generateId(id);
+    }
 }

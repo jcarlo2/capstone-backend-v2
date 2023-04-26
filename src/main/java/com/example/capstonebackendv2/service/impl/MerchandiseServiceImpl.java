@@ -330,4 +330,11 @@ public class MerchandiseServiceImpl implements MerchandiseService {
         List<MerchandiseExpiration> merch = expirationRepository.findAllByIdAndIsActiveOrderByTimestamp(id,"1");
         return merch.size() > 0 ? merch : null;
     }
+
+    @Override
+    public String generateId(@NotNull String id) {
+        if(id.equals("")) id = generate();
+        while(merchandiseRepository.existsByIdIgnoreCase(id)) id = generate();
+        return id;
+    }
 }

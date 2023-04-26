@@ -23,7 +23,7 @@ public class User {
     private int role;
     @Column(insertable = false)
     private String timestamp;
-    @Column(name = "is_active",insertable = false)
+    @Column(name = "is_active")
     private Boolean isActive;
 
     @Transient

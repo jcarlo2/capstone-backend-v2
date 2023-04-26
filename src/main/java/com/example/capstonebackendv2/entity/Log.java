@@ -21,4 +21,6 @@ public class Log {
     private String timestamp;
     @Column(name = "is_deletable")
     private Boolean isDeletable;
+    @Column(name = "is_archived")
+    private Boolean isArchived;
 }
