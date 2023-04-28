@@ -10,6 +10,7 @@ import com.example.capstonebackendv2.service.InventoryLossService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -31,8 +32,8 @@ public class InventoryLossServiceImpl implements InventoryLossService, Generate 
         return id;
     }
 
-    @Override
-    public void saveReportAndItems(InventoryLossReport report, List<InventoryLossItem> items) {
+    @Override @Transactional
+    public void  saveReportAndItems(InventoryLossReport report, List<InventoryLossItem> items) {
         itemRepository.saveAll(items);
         reportRepository.save(report);
     }
@@ -41,12 +42,13 @@ public class InventoryLossServiceImpl implements InventoryLossService, Generate 
     public List<InventoryLossReport> findAllReports(InventoryOption option) {
         Pageable pageable = PageRequest.of(0,option.getSize());
         return reportRepository.
-                findAllByIsValidAndIsArchivedAndIdContainingIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(
+                findAllByIsValidAndIsArchivedAndIdContainingIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanEqualAndReasonContainingIgnoreCaseOrderByTimestampDesc(
                         option.getIsValid(),
                         option.getIsArchived(),
                         option.getSearch(),
                         option.getStart() + "T00:00:00",
                         option.getEnd() + "T23:59:59",
+                        option.getCategory(),
                         pageable);
     }
 
@@ -65,5 +67,15 @@ public class InventoryLossServiceImpl implements InventoryLossService, Generate 
         reportRepository.invalidate(id);
         reportRepository.archive(id);
         return true;
+    }
+
+    @Override
+    public List<InventoryLossReport> findAllValidReportByEnd(String end) {
+        return reportRepository.findAllByIsValidAndTimestampLessThanEqualOrderByTimestampDesc(true,end);
+    }
+
+    @Override
+    public void archive(String id) {
+        reportRepository.archive(id);
     }
 }

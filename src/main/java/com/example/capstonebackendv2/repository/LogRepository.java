@@ -11,9 +11,9 @@ import java.util.List;
 
 @Repository
 public interface LogRepository extends CrudRepository<Log,String> {
-    List<Log> findAllByIsDeletableOrderByTimestampDesc(Boolean isDeletable);
+    List<Log> findAllByIsArchivedOrderByTimestampDesc(Boolean isArchived);
 
     @Transactional @Modifying
-    @Query(value = "UPDATE log SET is_archived = 1 WHERE is_deletable = 0",nativeQuery = true)
+    @Query(value = "UPDATE log SET is_archived = 1 WHERE is_deletable = 1",nativeQuery = true)
     void adminArchive();
 }

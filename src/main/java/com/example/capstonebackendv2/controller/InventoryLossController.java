@@ -1,6 +1,5 @@
 package com.example.capstonebackendv2.controller;
 
-import com.example.capstonebackendv2.dto.GoodsReceiptReportDTO;
 import com.example.capstonebackendv2.dto.InventoryLossDTO;
 import com.example.capstonebackendv2.dto.InventoryLossItemDTO;
 import com.example.capstonebackendv2.dto.InventoryLossReportDTO;
@@ -41,6 +40,7 @@ public class InventoryLossController {
 
     @GetMapping("/invalidate")
     public boolean invalidate(@RequestParam String id) {
+        System.out.println(id);
         return facade.invalidate(id);
     }
 }

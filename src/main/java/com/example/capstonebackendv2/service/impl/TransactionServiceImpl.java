@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService, Generate {
         return id;
     }
 
-    @Override
+    @Override @Transactional
     public void save(List<TransactionReportItem> itemList, TransactionReport transactionReport) {
         reportRepository.save(transactionReport);
         itemRepository.saveAll(itemList);

@@ -64,7 +64,7 @@ public class Mapper {
     public TransactionReport transactionDTOToReportEntity(@NotNull TransactionReportDTO report) {
         return new TransactionReport(
                 report.getId(), report.getUser(), "","",
-                true,false,report.getTotalAmount(),report.getCredit()
+                true,false,report.getTotalAmount(),report.getCredit(),report.getPayment()
         );
     }
 
@@ -99,7 +99,8 @@ public class Mapper {
                 report.getIsValid(),
                 report.getIsArchived(),
                 report.getTotalAmount(),
-                report.getCredit()
+                report.getCredit(),
+                report.getPayment()
         );
     }
 
@@ -370,7 +371,8 @@ public class Mapper {
                 "","",
                 true,false,
                 total,
-                dto.getReport().getCredit()
+                dto.getReport().getCredit(),
+                dto.getReport().getPayment()
         );
     }
 

@@ -21,9 +21,19 @@ public class UserController {
         return facade.verify(username,password);
     }
 
+    @GetMapping("verify-admin")
+    public boolean verifyAdmin(@RequestParam String password) {
+        return facade.verifyAdmin(password);
+    }
+
     @GetMapping("/get-info")
     public UserDTO getInfo(@RequestParam String username, @RequestParam String password) {
         return facade.getInfo(username,password);
+    }
+
+    @GetMapping("get-lastname")
+    public String getLastname(@RequestParam String username) {
+        return facade.getLastname(username);
     }
 
     @GetMapping("/user-list")
@@ -37,8 +47,8 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public void create(@RequestBody UserDTO user) {
-        facade.create(user);
+    public boolean create(@RequestBody UserDTO user) {
+        return facade.create(user);
     }
 
     @GetMapping("/change-password")

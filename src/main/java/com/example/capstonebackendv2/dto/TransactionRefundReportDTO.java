@@ -15,4 +15,5 @@ public class TransactionRefundReportDTO {
     private BigDecimal oldTotal;
     private BigDecimal newTotal;
     private BigDecimal credit;
+    private BigDecimal payment;
 }

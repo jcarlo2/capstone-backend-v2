@@ -1,9 +1,12 @@
 package com.example.capstonebackendv2.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
-@Getter @ToString
+@Getter @Setter @ToString
+@AllArgsConstructor
 public class InventoryOption {
     private String type;
     private String category;

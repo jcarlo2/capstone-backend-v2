@@ -13,8 +13,8 @@ import java.util.List;
 @Repository
 public interface InventoryLossReportRepository extends CrudRepository<InventoryLossReport,String> {
 
-    List<InventoryLossReport> findAllByIsValidAndIsArchivedAndIdContainingIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc
-            (Boolean valid, Boolean archived, String search, String start, String end, Pageable pageable);
+    List<InventoryLossReport> findAllByIsValidAndIsArchivedAndIdContainingIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanEqualAndReasonContainingIgnoreCaseOrderByTimestampDesc
+            (Boolean valid, Boolean archived, String search, String start, String end, String reason, Pageable pageable);
 
     @Transactional
     @Modifying
@@ -26,4 +26,5 @@ public interface InventoryLossReportRepository extends CrudRepository<InventoryL
     void archive(String id);
 
     List<InventoryLossReport> findAllByIsValidAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(Boolean IsValid, String start, String end );
+    List<InventoryLossReport> findAllByIsValidAndTimestampLessThanEqualOrderByTimestampDesc(Boolean isValid, String end);
 }

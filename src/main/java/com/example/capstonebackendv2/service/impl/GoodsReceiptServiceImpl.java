@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class GoodsReceiptServiceImpl implements GoodsReceiptService, Generate {
         return id;
     }
 
-    @Override
+    @Override @Transactional
     public void saveReportAndItems(GoodsReceiptReport report, List<GoodsReceiptItem> items) {
         reportRepository.save(report);
         itemRepository.saveAll(items);
@@ -42,12 +43,13 @@ public class GoodsReceiptServiceImpl implements GoodsReceiptService, Generate {
     public List<GoodsReceiptReport> findAllReports(@NotNull InventoryOption option) {
         Pageable pageable = PageRequest.of(0,option.getSize());
         return reportRepository.
-                findAllByIsValidAndIsArchivedAndIdContainingIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanEqualOrderByTimestampDesc(
+                findAllByIsValidAndIsArchivedAndIdContainingIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanEqualAndReasonContainingIgnoreCaseOrderByTimestampDesc(
                         option.getIsValid(),
                         option.getIsArchived(),
                         option.getSearch(),
                         option.getStart() + "T00:00:00",
                         option.getEnd() + "T23:59:59",
+                        option.getCategory(),
                         pageable);
     }
 
@@ -64,5 +66,15 @@ public class GoodsReceiptServiceImpl implements GoodsReceiptService, Generate {
     @Override
     public void invalidate(String id) {
         reportRepository.setInactive(id);
+    }
+
+    @Override
+    public List<GoodsReceiptReport> findAllValidReportByEnd(String end) {
+        return reportRepository.findAllByIsValidAndTimestampLessThanEqualOrderByTimestampDesc(true, end);
+    }
+
+    @Override
+    public void archive(String id) {
+        reportRepository.archive(id);
     }
 }

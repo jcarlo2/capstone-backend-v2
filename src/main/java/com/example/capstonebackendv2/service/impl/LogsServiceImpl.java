@@ -4,6 +4,7 @@ import com.example.capstonebackendv2.entity.Log;
 import com.example.capstonebackendv2.repository.LogRepository;
 import com.example.capstonebackendv2.service.LogsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class LogsServiceImpl implements LogsService {
 
     @Override
     public List<Log> show() {
-        return logRepository.findAllByIsDeletableOrderByTimestampDesc(true);
+        return logRepository.findAllByIsArchivedOrderByTimestampDesc(false);
     }
 
     @Override
@@ -25,9 +26,9 @@ public class LogsServiceImpl implements LogsService {
         logRepository.save(log);
     }
 
-    @Override
+    @Override @Transactional
     public void archive() {
         logRepository.adminArchive();
-        logRepository.save(new Log("","100000","Logs Archive","...","",true,false));
+        logRepository.save(new Log("","100000","Logs Archive","...","",false,false));
     }
 }

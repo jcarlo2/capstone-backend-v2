@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServicesImpl implements UserService {
@@ -34,8 +35,13 @@ public class UserServicesImpl implements UserService {
     }
 
     @Override
-    public void create(User user) {
+    public boolean create(User user) {
+        if(user.getFirstName().equalsIgnoreCase("admin")
+                || user.getLastName().equalsIgnoreCase("admin")) {
+            return false;
+        }
         userRepository.save(user);
+        return true;
     }
 
     @Override
@@ -52,5 +58,11 @@ public class UserServicesImpl implements UserService {
     @Override
     public void archive(String id, String pass) {
         userRepository.archiveUserAccount(id);
+    }
+
+    @Override
+    public String getLastname(String username) {
+        Optional<User> user = userRepository.findById(username);
+        return user.isPresent() ? user.get().getLastName() : "User";
     }
 }

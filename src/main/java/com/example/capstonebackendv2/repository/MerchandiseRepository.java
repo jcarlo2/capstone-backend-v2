@@ -23,8 +23,10 @@ public interface MerchandiseRepository extends CrudRepository<Merchandise, Strin
     @Query(value = "UPDATE product SET price = ?2 WHERE id = ?1",nativeQuery = true)
     void updatePrice(String id, BigDecimal price);
 
-    Page<Merchandise> findAllByIdContainsIgnoreCaseOrDescriptionContainsIgnoreCase(String id, String description, Pageable pageable);
-    Page<Merchandise> findAllByPriceLessThanEqualAndIsActive(BigDecimal search, boolean isActive, Pageable pageable);
+    List<Merchandise> findAllByIdContainsIgnoreCaseOrDescriptionContainsIgnoreCase(String id, String description);
+    List<Merchandise> findAllByIdContainsIgnoreCaseOrDescriptionContainsIgnoreCase(String id, String description, Pageable pageable);
+    List<Merchandise> findAllByPriceLessThanEqualAndIsActive(BigDecimal search, boolean isActive);
+    List<Merchandise> findAllByPriceLessThanEqualAndIsActive(BigDecimal search, boolean isActive, Pageable pageable);
     Merchandise findByIdAndIsActive(String id, Boolean isActive);
     boolean existsByIdIgnoreCase(String id);
 

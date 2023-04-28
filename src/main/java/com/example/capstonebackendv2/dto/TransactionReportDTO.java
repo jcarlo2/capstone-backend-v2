@@ -16,4 +16,5 @@ public class TransactionReportDTO {
     private Boolean isArchived;
     private BigDecimal totalAmount;
     private BigDecimal credit;
+    private BigDecimal payment;
 }

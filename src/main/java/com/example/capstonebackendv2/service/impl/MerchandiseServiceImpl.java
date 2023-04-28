@@ -10,7 +10,6 @@ import com.example.capstonebackendv2.repository.*;
 import com.example.capstonebackendv2.service.MerchandiseService;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -22,9 +21,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,25 +45,38 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     @Override
     public List<Merchandise> findAll(int size, String sortBy, Category category, String search, boolean isAscending) {
         if(size < 50) size = 50;
-        if(sortBy.equals("Stock")) sortBy = "quantity";
+        if(sortBy.equalsIgnoreCase("Stock")) sortBy = "quantity";
         Sort sort = isAscending ? Sort.by(sortBy) : Sort.by(Sort.Direction.DESC,sortBy);
         Pageable pageable = PageRequest.of(0,size, sort);
-        Page<Merchandise> pageList = isValidPositiveNumber(search)
-            ? merchandiseRepository.findAllByPriceLessThanEqualAndIsActive(new BigDecimal(search), true, pageable)
-            : merchandiseRepository.findAllByIdContainsIgnoreCaseOrDescriptionContainsIgnoreCase(search, search,pageable);
-
-        return filterByCategory(category, pageList.getContent());
+        boolean isAll = category.equals(Category.ALL);
+        boolean isValidNumber = isValidPositiveNumber(search);
+        List<Merchandise> list;
+        if(isAll) {
+            list = isValidNumber
+                    ? merchandiseRepository.findAllByPriceLessThanEqualAndIsActive(new BigDecimal(search), true, pageable)
+                    : merchandiseRepository.findAllByIdContainsIgnoreCaseOrDescriptionContainsIgnoreCase(search, search,pageable);
+        }else {
+            list = isValidNumber
+                    ? merchandiseRepository.findAllByPriceLessThanEqualAndIsActive(new BigDecimal(search), true)
+                    : merchandiseRepository.findAllByIdContainsIgnoreCaseOrDescriptionContainsIgnoreCase(search, search);
+        }
+        return isAll ? list : filterByCategory(category, sortBy, list, size, isAscending);
     }
 
     @Override
-    public List<Merchandise> filterByCategory(Category category, @NotNull List<Merchandise> list) {
-        if(category == Category.ALL) return list;
+    public List<Merchandise> filterByCategory(Category category,String sortBy, @NotNull List<Merchandise> list, int size, boolean isAscending) {
         List<Merchandise> newList = new ArrayList<>();
-        for (Merchandise item : list) {
-            if (categoryRepository.existsByIdAndCategory(item.getId(), category)) {
-                newList.add(item);
+        for (Merchandise merchandise : list) {
+            if (size <= 0) break;
+            if (categoryRepository.existsByIdAndCategory(merchandise.getId(), category)) {
+                newList.add(merchandise);
             }
         }
+        if(sortBy.equalsIgnoreCase("id")) newList.sort(Comparator.comparing(Merchandise::getId));
+        else if(sortBy.equalsIgnoreCase("description")) newList.sort(Comparator.comparing(Merchandise::getDescription));
+        else if(sortBy.equalsIgnoreCase("price")) newList.sort(Comparator.comparing(Merchandise::getPrice));
+        else newList.sort(Comparator.comparing(Merchandise::getQuantity));
+        if(!isAscending) Collections.reverse(newList);
         return newList;
     }
 
@@ -184,13 +194,13 @@ public class MerchandiseServiceImpl implements MerchandiseService {
             String color = "critical";
 
             if (daysDiff <= 1) reason = "Will expired today";
-            else if (daysDiff <= 2) reason = "Will expired within 2 days";
-            else if (daysDiff <= 3) reason = "Will expired within 3 days";
+            else if (daysDiff <= 2) reason = "Expiration within 2 days";
+            else if (daysDiff <= 3) reason = "Expiration within 3 days";
             else if (daysDiff <= 7) {
-                reason = "Will expired within a week";
+                reason = "Expiration within a week";
                 color = "low";
             } else if (daysDiff <= 14) {
-                reason = "Will expired within two weeks";
+                reason = "Expiration within two weeks";
                 color = "low";
             }
             if (reason.equals("")) return null;
@@ -227,7 +237,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
         return discount == null ? 0 : discount.getDiscount();
     }
 
-    @Override
+    @Override @Transactional
     public void updateQuantity(String id, Integer quantity) {
         merchandiseRepository.updateQuantity(id,quantity);
     }
@@ -267,8 +277,8 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     }
 
     @Override
-    public boolean isMerchandiseExpirationActiveAndHasStock(String id, String reportId, Integer quantity) {
-        return expirationRepository.existsByIdAndReportIdAndIsActiveAndQuantityGreaterThan(id,reportId,"1",quantity);
+    public boolean isMerchandiseExpirationActiveAndHasCompleteStock(String id, String reportId, Integer quantity) {
+        return expirationRepository.existsByIdAndReportIdAndIsActiveAndQuantityLessThan(id,reportId,"1",quantity);
     }
 
     @Override
@@ -315,7 +325,7 @@ public class MerchandiseServiceImpl implements MerchandiseService {
     public void dispose(String id) {
         List<MerchandiseExpiration> expirationList = expirationRepository.findAllByIdAndIsActiveOrderByTimestampDesc(id,"3");
         expirationList.forEach(item -> {
-            expirationRepository.updateToDisposeExpiration(item.getId(),item.getTimestamp(),item.getReportId());
+            expirationRepository.dispose(item.getId(),item.getTimestamp(),item.getReportId());
             merchandiseRepository.updateQuantity(item.getId(),-1 * item.getQuantity());
         });
     }

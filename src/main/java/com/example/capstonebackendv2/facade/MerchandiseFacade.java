@@ -26,7 +26,6 @@ public class MerchandiseFacade {
 
     /**
      * Auto checking and validating of all merchandise expiration
-     * set isActive to false then create @NullReport
      **/
     private void autoCheckerOfMerchandiseExpiration() {
         Runnable run = () -> {

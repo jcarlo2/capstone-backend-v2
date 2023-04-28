@@ -24,11 +24,11 @@ public interface MerchandiseService {
     void saveProductExpiration(List<MerchandiseExpiration> itemList);
     String findExpirationDateById(String id, String reportId);
     void updateMerchandisePrice(String id, BigDecimal price);
-    boolean isMerchandiseExpirationActiveAndHasStock(String id, String reportId, Integer quantity);
+    boolean isMerchandiseExpirationActiveAndHasCompleteStock(String id, String reportId, Integer quantity);
     void invalidateExpiration(String id, String report);
     void updateProductExpiryQuantityAndSetActive(String id, Integer quantity);
     List<MerchandiseDiscount> findAllDiscount(String id);
-    List<Merchandise> filterByCategory(Category category, @NotNull List<Merchandise> list);
+    List<Merchandise> filterByCategory(Category category, String sortBy, @NotNull List<Merchandise> pages, int size, boolean isAscending);
     boolean isValidPositiveNumber(String str);
     MerchandiseHistory createHistory(Merchandise original, MerchandiseDTO dto);
     void updateInfo(MerchandiseHistory history, Merchandise merchandise);

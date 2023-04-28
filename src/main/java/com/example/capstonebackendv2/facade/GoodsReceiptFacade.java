@@ -4,23 +4,49 @@ import com.example.capstonebackendv2.dto.GoodsReceiptItemDTO;
 import com.example.capstonebackendv2.dto.GoodsReceiptReportDTO;
 import com.example.capstonebackendv2.entity.GoodsReceiptItem;
 import com.example.capstonebackendv2.entity.GoodsReceiptReport;
+import com.example.capstonebackendv2.gui.GUI;
 import com.example.capstonebackendv2.helper.Mapper;
 import com.example.capstonebackendv2.service.impl.GoodsReceiptServiceImpl;
 import com.example.capstonebackendv2.service.impl.MerchandiseServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class GoodsReceiptFacade {
     private final GoodsReceiptServiceImpl service;
     private final MerchandiseServiceImpl merchandiseService;
     private final Mapper mapper;
+    private final GUI gui;
 
-    public GoodsReceiptFacade(GoodsReceiptServiceImpl service, MerchandiseServiceImpl merchandiseService, Mapper mapper) {
+    public GoodsReceiptFacade(GoodsReceiptServiceImpl service, MerchandiseServiceImpl merchandiseService, Mapper mapper, GUI gui) {
         this.service = service;
         this.merchandiseService = merchandiseService;
         this.mapper = mapper;
+        this.gui = gui;
+        autoArchivedRecordFromPastYear();
+    }
+
+    private void autoArchivedRecordFromPastYear() {
+        Runnable run = () -> {
+            LocalDate pastDate = LocalDate.now();
+            int num = gui.getArchiveNumber();
+            switch (num) {
+                case 1 -> pastDate = pastDate.minusMonths(1);
+                case 3 -> pastDate = pastDate.minusMonths(3);
+                case 6 -> pastDate = pastDate.minusMonths(6);
+                default -> pastDate = pastDate.minusYears(1);
+            }
+            String date = pastDate + "T23:59:59";
+            List<GoodsReceiptReport> reportList = service.findAllValidReportByEnd(date);
+            reportList.forEach(report -> service.archive(report.getId()));
+        };
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        executorService.scheduleAtFixedRate(run,1,60, TimeUnit.SECONDS);
     }
 
     public String generateId(String id) {
@@ -57,7 +83,7 @@ public class GoodsReceiptFacade {
         for(GoodsReceiptItem item : itemList) {
             if(
                 !merchandiseService.hasStock(item.getProductId(), item.getQuantity()) ||
-                merchandiseService.isMerchandiseExpirationActiveAndHasStock(item.getProductId(),id, item.getQuantity())
+                merchandiseService.isMerchandiseExpirationActiveAndHasCompleteStock(item.getProductId(),id, item.getQuantity())
             ) return false;
         }
         itemList.forEach(item -> {

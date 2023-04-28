@@ -16,11 +16,15 @@ public interface MerchandiseExpirationRepository extends CrudRepository<Merchand
     void toInactiveWithTimestamp(String id, String timestamp, String reportId);
 
     @Transactional @Modifying
-    @Query(value = "UPDATE product_expiration SET is_active = 0 WHERE id = ?1 AND timestamp = ?2 AND report_id = ?3",nativeQuery = true)
+    @Query(value = "UPDATE product_expiration SET is_active = 3 WHERE id = ?1 AND timestamp = ?2 AND report_id = ?3",nativeQuery = true)
     void updateToDisposeExpiration(String id, String timestamp, String reportId);
 
     @Transactional @Modifying
-    @Query(value = "UPDATE product_expiration SET quantity = quantity + ?2 WHERE id = ?1 AND is_active = 1 AND timestamp = ?3",nativeQuery = true)
+    @Query(value = "UPDATE product_expiration SET is_active = 0 WHERE id = ?1 AND timestamp = ?2 AND report_id = ?3",nativeQuery = true)
+    void dispose(String id, String timestamp, String reportId);
+
+    @Transactional @Modifying
+    @Query(value = "UPDATE product_expiration SET quantity = quantity + ?2 WHERE id = ?1 AND is_active = 1 AND timestamp = ?3 LIMIT 1",nativeQuery = true)
     void updateQuantity(String id, Integer quantity, String timestamp);
 
     @Transactional @Modifying
@@ -35,5 +39,5 @@ public interface MerchandiseExpirationRepository extends CrudRepository<Merchand
     List<MerchandiseExpiration> findAllByIsActiveOrderByTimestampDesc(String isActive);
     List<MerchandiseExpiration> findAllByIdAndIsActiveOrderByTimestamp(String id, String isActive);
     MerchandiseExpiration findByIdAndReportIdAndIsActiveOrderByTimestampDesc(String id, String reportId, String isActive);
-    boolean existsByIdAndReportIdAndIsActiveAndQuantityGreaterThan(String id, String reportId, String isActive, Integer quantity);
+    boolean existsByIdAndReportIdAndIsActiveAndQuantityLessThan(String id, String reportId, String isActive, Integer quantity);
 }

@@ -37,8 +37,8 @@ public class UserFacade {
         return service.generate(id);
     }
 
-    public void create(UserDTO user) {
-        service.create(mapper.userDTOToEntity(user));
+    public boolean create(UserDTO user) {
+        return service.create(mapper.userDTOToEntity(user));
     }
 
     public boolean changePassword(String id, @NotNull String oldPassword, @NotNull String newPassword) {
@@ -52,12 +52,20 @@ public class UserFacade {
     }
 
     public boolean archive(@NotNull String id, @NotNull String password) {
-        if(id.equals("100000")) return false;
+        if(id.equals("100000") || id.equals("1000001")) return false;
         String pass = Base64.getEncoder().encodeToString(password.getBytes());
-        if(service.verify("100000",password)) {
+        if(service.verify("100000",password) || service.verify("100001",password)) {
             service.archive(id,pass);
             return true;
         }
         return false;
+    }
+
+    public boolean verifyAdmin(@NotNull String password) {
+        return service.verify("100000",password) || service.verify("100001",password);
+    }
+
+    public String getLastname(String username) {
+        return service.getLastname(username);
     }
 }

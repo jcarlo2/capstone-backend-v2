@@ -13,4 +13,6 @@ public interface InventoryLossService {
     List<InventoryLossItem> findAllItems(String id);
     InventoryLossReport findReportById(String id);
     boolean invalidate(String id);
+    List<InventoryLossReport> findAllValidReportByEnd(String end);
+    void archive(String id);
 }

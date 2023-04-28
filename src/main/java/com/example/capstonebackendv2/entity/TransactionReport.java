@@ -29,4 +29,5 @@ public class TransactionReport {
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
     private BigDecimal credit;
+    private BigDecimal payment;
 }
